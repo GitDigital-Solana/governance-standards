@@ -1,0 +1,73 @@
+### **governance-standards/standards/cis-aws-1.4.yaml**
+```yaml
+# CIS AWS Foundations Benchmark v1.4
+standard:
+  id: CIS-AWS-1.4
+  name: "CIS Amazon Web Services Foundations Benchmark"
+  version: "1.4.0"
+  description: "Security best practices for AWS"
+  url: "https://www.cisecurity.org/benchmark/amazon_web_services"
+  published_date: "2023-05-31"
+  category: security
+
+controls:
+  - id: "1.1"
+    title: "Avoid the use of the 'root' account"
+    description: "The 'root' account has unrestricted access to all resources in the AWS account. It is highly recommended that the use of this account be avoided."
+    severity: critical
+    checks:
+      - name: "root-account-usage"
+        condition: "$.user_name == 'root'"
+        message: "Root account should not be used for daily operations"
+    
+  - id: "1.2"
+    title: "Ensure multi-factor authentication (MFA) is enabled for all IAM users that have a console password"
+    description: "Multi-Factor Authentication (MFA) adds an extra layer of protection on top of a user name and password."
+    severity: high
+    checks:
+      - name: "mfa-enabled"
+        condition: "$.mfa_active == true"
+        message: "MFA must be enabled for IAM users with console access"
+    
+  - id: "1.3"
+    title: "Ensure credentials unused for 90 days or greater are disabled"
+    description: "AWS IAM users can access AWS resources using different types of credentials. You can monitor when an IAM user last used their credentials."
+    severity: medium
+    checks:
+      - name: "unused-credentials"
+        condition: "$.password_last_used.days_ago < 90"
+        message: "Credentials unused for 90+ days should be disabled"
+    
+  - id: "1.4"
+    title: "Ensure access keys are rotated every 90 days or less"
+    description: "Access keys consist of an access key ID and secret access key which are used to sign programmatic requests that you make to AWS."
+    severity: high
+    checks:
+      - name: "access-key-rotation"
+        condition: "$.access_key_last_used.days_ago < 90"
+        message: "Access keys should be rotated every 90 days"
+    
+  - id: "2.1.1"
+    title: "Ensure all S3 buckets employ encryption-at-rest"
+    description: "Amazon S3 provides a variety of no, or low-cost, encryption options to protect data at rest."
+    severity: high
+    checks:
+      - name: "s3-bucket-encryption"
+        condition: "$.ServerSideEncryptionConfiguration != null"
+        message: "S3 buckets must have encryption enabled"
+
+mapping:
+  policy_templates:
+    - name: "cis-aws-foundations"
+      description: "CIS AWS Foundations Benchmark controls"
+      rules: 
+        - "1.1"
+        - "1.2"
+        - "1.3"
+        - "1.4"
+        - "2.1.1"
+  
+  compliance_frameworks:
+    - NIST-800-53
+    - ISO-27001
+    - PCI-DSS
