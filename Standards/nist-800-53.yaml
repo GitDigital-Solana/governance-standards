@@ -1,0 +1,72 @@
+governance-standards/standards/nist-800-53.yaml
+
+```yaml
+# NIST Special Publication 800-53 Revision 5
+standard:
+  id: NIST-800-53
+  name: "Security and Privacy Controls for Information Systems and Organizations"
+  version: "Revision 5"
+  description: "Catalog of security and privacy controls for federal information systems and organizations"
+  url: "https://csrc.nist.gov/publications/detail/sp/800-53/rev-5/final"
+  published_date: "2020-09-23"
+  category: security
+
+families:
+  - id: "AC"
+    name: "Access Control"
+    description: "Limiting information system access to authorized users, processes acting on behalf of authorized users, or devices."
+    controls:
+      - id: "AC-1"
+        title: "Policy and Procedures"
+        description: "Develop, document, and disseminate access control policy and procedures."
+      
+      - id: "AC-2"
+        title: "Account Management"
+        description: "Manage system accounts."
+      
+      - id: "AC-3"
+        title: "Access Enforcement"
+        description: "Enforce approved authorizations for logical access to information and system resources."
+  
+  - id: "AU"
+    name: "Audit and Accountability"
+    description: "Creating, protecting, and retaining information system audit records."
+    controls:
+      - id: "AU-2"
+        title: "Audit Events"
+        description: "Determine the events that the system is capable of auditing."
+      
+      - id: "AU-3"
+        title: "Content of Audit Records"
+        description: "Ensure audit records contain necessary information."
+      
+      - id: "AU-6"
+        title: "Audit Review, Analysis, and Reporting"
+        description: "Review and analyze system audit records."
+
+implementation:
+  aws_mapping:
+    - control: "AC-2"
+      aws_service: "IAM"
+      checks:
+        - name: "account-management"
+          condition: "$.policy_document contains 'iam:CreateUser'"
+    
+    - control: "AU-2"
+      aws_service: "CloudTrail"
+      checks:
+        - name: "cloudtrail-enabled"
+          condition: "$.trails.length > 0"
+
+compliance_categories:
+  - category: "Low Impact"
+    description: "Systems processing low-impact information"
+    required_controls: ["AC-1", "AC-2", "AU-2"]
+  
+  - category: "Moderate Impact"
+    description: "Systems processing moderate-impact information"
+    required_controls: ["AC-1", "AC-2", "AC-3", "AU-2", "AU-3"]
+  
+  - category: "High Impact"
+    description: "Systems processing high-impact information"
+    required_controls: ["AC-1", "AC-2", "AC-3", "AU-2", "AU-3", "AU-6"]
